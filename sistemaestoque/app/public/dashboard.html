@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Movimentações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 48%;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .chart {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 93%;
+        }
+
+        .chart h2 {
+            margin-top: 0;
+            color: #444;
+            text-align: center;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0d556d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #000000;
+        }
+    </style>
+</head>
+        <!-- Botão de voltar -->
+        <a href="index.html" class="back-button">Voltar para a Página Inicial</a>
+        </div>
+<body>
+    <div class="dashboard">
+        <h1>Dashboard de Movimentações</h1>
+        <div class="filters">
+            <select id="pcSelect" onchange="updateCharts()">
+                <option value="Todos">Todos os Sapatos</option>
+            </select>
+            <select id="dateSelect" onchange="updateCharts()">
+                <option value="Todos">Todas as Datas</option>
+            </select>
+        </div>
+        <div class="charts">
+            <div class="chart">
+                <h2>Percentual de Vendas por Mês</h2>
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="chart">
+                <h2>Top 5 Mais Vendidos</h2>
+                <canvas id="top5IdleChart"></canvas>
+            </div>
+            <div class="chart">
+                <h2>Top 5 Menos Vendidos</h2>
+                <canvas id="top5ActiveChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script>
+        const data = [
+
+            { pc: 'PR002', data: '11/10/2024', emUso: '1:50:33', ocioso: '10:14:16', horaTotal: '12:04:49' },
+            { pc: 'PR002', data: '10/10/2024', emUso: '1:47:58', ocioso: '10:02:30', horaTotal: '11:50:29' },
+            { pc: 'PR002', data: '09/10/2024', emUso: '2:10:35', ocioso: '9:41:49', horaTotal: '11:52:24' },
+            { pc: 'PR002', data: '08/10/2024', emUso: '1:45:59', ocioso: '10:12:31', horaTotal: '11:58:31' },
+            { pc: 'PR002', data: '07/10/2024', emUso: '0:59:04', ocioso: '8:14:13', horaTotal: '9:13:17' },
+            { pc: 'PR005', data: '11/10/2024', emUso: '0:24:31', ocioso: '10:29:28', horaTotal: '10:53:59' },
+            { pc: 'PR005', data: '10/10/2024', emUso: '0:56:09', ocioso: '9:37:48', horaTotal: '10:33:57' },
+            { pc: 'PR005', data: '09/10/2024', emUso: '0:39:11', ocioso: '8:58:22', horaTotal: '9:37:34' },
+            { pc: 'PR005', data: '08/10/2024', emUso: '1:21:07', ocioso: '10:08:04', horaTotal: '11:29:11' },
+            { pc: 'PR005', data: '07/10/2024', emUso: '0:22:52', ocioso: '11:19:42', horaTotal: '11:42:34' },
+            { pc: 'PR006', data: '11/10/2024', emUso: '2:32:24', ocioso: '16:56:15', horaTotal: '19:28:39' },
+            { pc: 'PR006', data: '10/10/2024', emUso: '1:47:29', ocioso: '10:20:42', horaTotal: '12:08:11' },
+            { pc: 'PR006', data: '09/10/2024', emUso: '2:20:44', ocioso: '16:48:17', horaTotal: '19:09:01' },
+            { pc: 'PR006', data: '08/10/2024', emUso: '2:34:38', ocioso: '16:09:40', horaTotal: '18:44:18' },
+            { pc: 'PR006', data: '07/10/2024', emUso: '1:26:01', ocioso: '7:34:54', horaTotal: '9:00:54' },
+            { pc: 'PR008', data: '11/10/2024', emUso: '2:40:47', ocioso: '6:44:31', horaTotal: '9:25:18' },
+            { pc: 'PR008', data: '10/10/2024', emUso: '1:05:02', ocioso: '8:34:16', horaTotal: '9:39:18' },
+            { pc: 'PR008', data: '09/10/2024', emUso: '3:29:32', ocioso: '6:00:50', horaTotal: '9:30:23' },
+            { pc: 'PR008', data: '08/10/2024', emUso: '1:38:01', ocioso: '7:47:36', horaTotal: '9:25:37' },
+            { pc: 'PR008', data: '07/10/2024', emUso: '1:08:35', ocioso: '7:45:09', horaTotal: '8:53:44' },
+            { pc: 'PR009', data: '11/10/2024', emUso: '3:45:44', ocioso: '8:20:08', horaTotal: '12:05:51' },
+            { pc: 'PR009', data: '10/10/2024', emUso: '3:07:08', ocioso: '8:28:12', horaTotal: '11:35:20' },
+            { pc: 'PR009', data: '09/10/2024', emUso: '3:11:26', ocioso: '8:00:17', horaTotal: '11:11:43' },
+            { pc: 'PR009', data: '08/10/2024', emUso: '2:10:05', ocioso: '7:02:13', horaTotal: '9:12:18' },
+            { pc: 'PR009', data: '07/10/2024', emUso: '3:03:58', ocioso: '5:17:59', horaTotal: '8:21:56' },
+            { pc: 'PR013', data: '11/10/2024', emUso: '1:09:59', ocioso: '10:17:12', horaTotal: '11:27:11' },
+            { pc: 'PR013', data: '10/10/2024', emUso: '1:29:14', ocioso: '10:12:57', horaTotal: '11:42:11' },
+            { pc: 'PR013', data: '09/10/2024', emUso: '0:49:37', ocioso: '10:38:14', horaTotal: '11:27:50' },
+            { pc: 'PR013', data: '08/10/2024', emUso: '1:37:06', ocioso: '10:10:35', horaTotal: '11:47:41' },
+            { pc: 'PR013', data: '07/10/2024', emUso: '0:47:12', ocioso: '9:11:20', horaTotal: '9:58:32' },
+            { pc: 'PR014', data: '11/10/2024', emUso: '5:16:01', ocioso: '4:08:20', horaTotal: '9:24:21' },
+            { pc: 'PR014', data: '10/10/2024', emUso: '2:07:48', ocioso: '2:21:41', horaTotal: '4:29:29' },
+            { pc: 'PR014', data: '09/10/2024', emUso: '5:58:38', ocioso: '3:26:57', horaTotal: '9:25:36' },
+            { pc: 'PR014', data: '08/10/2024', emUso: '5:13:54', ocioso: '6:30:36', horaTotal: '11:44:30' },
+            { pc: 'PR014', data: '07/10/2024', emUso: '4:07:02', ocioso: '3:34:59', horaTotal: '7:42:01' },
+            { pc: 'PR016', data: '11/10/2024', emUso: '3:48:50', ocioso: '7:49:13', horaTotal: '11:38:02' },
+            { pc: 'PR016', data: '10/10/2024', emUso: '3:20:59', ocioso: '8:22:51', horaTotal: '11:43:50' },
+            { pc: 'PR016', data: '09/10/2024', emUso: '4:32:05', ocioso: '6:42:43', horaTotal: '11:14:48' },
+            { pc: 'PR016', data: '08/10/2024', emUso: '3:15:07', ocioso: '8:15:14', horaTotal: '11:30:21' },
+            { pc: 'PR016', data: '07/10/2024', emUso: '3:16:59', ocioso: '4:28:41', horaTotal: '7:45:39' },
+            { pc: 'PR017', data: '11/10/2024', emUso: '1:24:57', ocioso: '9:00:03', horaTotal: '10:25:00' },
+            { pc: 'PR017', data: '10/10/2024', emUso: '1:09:29', ocioso: '22:25:24', horaTotal: '23:34:53' },
+            { pc: 'PR017', data: '09/10/2024', emUso: '1:14:53', ocioso: '10:25:19', horaTotal: '11:40:13' },
+            { pc: 'PR017', data: '08/10/2024', emUso: '1:35:29', ocioso: '9:34:18', horaTotal: '11:09:47' },
+            { pc: 'PR017', data: '07/10/2024', emUso: '0:32:49', ocioso: '8:31:02', horaTotal: '9:03:52' },
+            { pc: 'PR018', data: '11/10/2024', emUso: '0:50:13', ocioso: '15:31:46', horaTotal: '16:21:58' },
+            { pc: 'PR018', data: '10/10/2024', emUso: '1:11:44', ocioso: '19:44:12', horaTotal: '20:55:56' },
+            { pc: 'PR018', data: '09/10/2024', emUso: '0:44:21', ocioso: '19:55:38', horaTotal: '20:39:59' },
+            { pc: 'PR018', data: '08/10/2024', emUso: '1:02:15', ocioso: '19:52:14', horaTotal: '20:54:29' },
+            { pc: 'PR018', data: '07/10/2024', emUso: '0:45:27', ocioso: '10:51:35', horaTotal: '11:37:02' },
+            { pc: 'PR021', data: '11/10/2024', emUso: '3:39:23', ocioso: '15:54:23', horaTotal: '19:33:45' },
+            { pc: 'PR021', data: '10/10/2024', emUso: '3:10:02', ocioso: '15:09:12', horaTotal: '18:19:14' },
+            { pc: 'PR021', data: '09/10/2024', emUso: '2:31:29', ocioso: '16:37:47', horaTotal: '19:09:16' },
+            { pc: 'PR021', data: '08/10/2024', emUso: '2:48:23', ocioso: '16:09:34', horaTotal: '18:57:57' },
+            { pc: 'PR022', data: '11/10/2024', emUso: '1:45:22', ocioso: '8:09:17', horaTotal: '9:54:39' },
+            { pc: 'PR022', data: '10/10/2024', emUso: '1:54:12', ocioso: '8:32:51', horaTotal: '10:27:03' },
+            { pc: 'PR022', data: '09/10/2024', emUso: '2:05:30', ocioso: '5:25:45', horaTotal: '7:31:15' },
+            { pc: 'PR022', data: '08/10/2024', emUso: '1:18:33', ocioso: '7:14:06', horaTotal: '8:32:39' },
+            { pc: 'PR027', data: '11/10/2024', emUso: '2:14:51', ocioso: '12:01:02', horaTotal: '14:15:54' },
+            { pc: 'PR027', data: '10/10/2024', emUso: '3:06:17', ocioso: '16:01:52', horaTotal: '19:08:08' },
+            { pc: 'PR027', data: '09/10/2024', emUso: '4:06:33', ocioso: '13:46:42', horaTotal: '17:53:15' },
+            { pc: 'PR027', data: '08/10/2024', emUso: '1:12:10', ocioso: '15:49:33', horaTotal: '17:01:44' },
+            { pc: 'PR027', data: '07/10/2024', emUso: '1:28:01', ocioso: '7:15:52', horaTotal: '8:43:53' },
+            { pc: 'PR046', data: '11/10/2024', emUso: '3:06:36', ocioso: '6:04:25', horaTotal: '9:11:01' },
+            { pc: 'PR046', data: '10/10/2024', emUso: '2:34:32', ocioso: '5:07:39', horaTotal: '7:42:11' },
+            { pc: 'PR046', data: '09/10/2024', emUso: '5:31:20', ocioso: '3:56:31', horaTotal: '9:27:50' },
+            { pc: 'PR046', data: '08/10/2024', emUso: '4:11:12', ocioso: '5:05:37', horaTotal: '9:16:49' },
+            { pc: 'PR046', data: '07/10/2024', emUso: '2:22:12', ocioso: '3:45:48', horaTotal: '6:08:00' },
+            { pc: 'PR047', data: '11/10/2024', emUso: '6:12:21', ocioso: '3:17:48', horaTotal: '9:30:09' },
+            { pc: 'PR047', data: '10/10/2024', emUso: '4:27:53', ocioso: '5:02:17', horaTotal: '9:30:10' },
+            { pc: 'PR047', data: '09/10/2024', emUso: '0:40:52', ocioso: '9:01:27', horaTotal: '9:42:19' },
+            { pc: 'PR047', data: '08/10/2024', emUso: '6:22:55', ocioso: '5:35:48', horaTotal: '11:58:43' },
+            { pc: 'PR047', data: '07/10/2024', emUso: '5:52:11', ocioso: '4:23:13', horaTotal: '10:15:24' },
+            { pc: 'PR049', data: '11/10/2024', emUso: '0:38:24', ocioso: '11:10:54', horaTotal: '11:49:19' },
+            { pc: 'PR049', data: '10/10/2024', emUso: '0:57:23', ocioso: '10:46:33', horaTotal: '11:43:56' },
+            { pc: 'PR049', data: '09/10/2024', emUso: '1:01:52', ocioso: '10:31:40', horaTotal: '11:33:32' },
+            { pc: 'PR049', data: '08/10/2024', emUso: '0:41:25', ocioso: '10:58:56', horaTotal: '11:40:21' },
+            { pc: 'PR049', data: '07/10/2024', emUso: '0:28:53', ocioso: '10:09:42', horaTotal: '10:38:35' },
+            { pc: 'PR052', data: '11/10/2024', emUso: '0:38:00', ocioso: '10:41:04', horaTotal: '11:19:04' },
+            { pc: 'PR052', data: '10/10/2024', emUso: '0:44:58', ocioso: '10:27:26', horaTotal: '11:12:23' },
+            { pc: 'PR052', data: '09/10/2024', emUso: '0:54:49', ocioso: '10:38:35', horaTotal: '11:33:24' },
+            { pc: 'PR052', data: '08/10/2024', emUso: '1:05:30', ocioso: '10:12:35', horaTotal: '11:18:05' },
+            { pc: 'PR052', data: '07/10/2024', emUso: '0:13:03', ocioso: '10:49:33', horaTotal: '11:02:37' },
+        ];
+
+
+
+        function populatePCSelect() {
+            const pcSelect = document.getElementById('pcSelect');
+            const uniquePCs = [...new Set(data.map(item => item.pc))];
+            uniquePCs.forEach(pc => {
+                const option = document.createElement('option');
+                option.value = pc;
+                option.textContent = pc;
+                pcSelect.appendChild(option);
+            });
+        }
+
+        function populateDateSelect() {
+            const dateSelect = document.getElementById('dateSelect');
+            const uniqueDates = [...new Set(data.map(item => item.data))];
+            uniqueDates.forEach(date => {
+                const option = document.createElement('option');
+                option.value = date;
+                option.textContent = date;
+                dateSelect.appendChild(option);
+            });
+        }
+
+        function convertToMinutes(timeString) {
+            const [hours, minutes, seconds] = timeString.split(':').map(Number);
+            return hours * 60 + minutes + seconds / 60;
+        }
+
+        function updateCharts() {
+            const selectedPC = document.getElementById('pcSelect').value;
+            const selectedDate = document.getElementById('dateSelect').value;
+
+            let filteredData = data;
+
+            if (selectedPC !== 'Todos') {
+                filteredData = filteredData.filter(item => item.pc === selectedPC);
+            }
+
+            if (selectedDate !== 'Todos') {
+                filteredData = filteredData.filter(item => item.data === selectedDate);
+            }
+
+            updatePieChart(filteredData);
+            updateTop5Chart('top5IdleChart', filteredData, 'ocioso', 'Top 5 Mais Vendidos');
+            updateTop5Chart('top5ActiveChart', filteredData, 'emUso', 'Top 5 Menos Vendidos');
+        }
+
+        function updateBarChart(chartId, data, key, label) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            const chart = Chart.getChart(chartId);
+            if (chart) {
+                chart.destroy();
+            }
+
+            const hoursData = data.map(item => convertToMinutes(item[key]));
+            const totalHours = hoursData.reduce((acc, val) => acc + val, 0);
+            const percentages = hoursData.map(value => ((value / totalHours) * 100).toFixed(2));
+
+            const newChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.pc),
+                    datasets: [{
+                        label: label,
+                        data: hoursData,
+                        backgroundColor: key === 'ocioso' ? '#8884d8' : '#82ca9d',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Quantidade'
+                            }
+                        },
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    const totalMinutes = tooltipItem.raw;
+                                    const hours = Math.floor(totalMinutes / 60);
+                                    const minutes = totalMinutes % 60;
+                                    const percentage = percentages[tooltipItem.dataIndex];
+                                    return `${label}: ${hours}h ${minutes}m (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            formatter: function (value, context) {
+                                const percentage = percentages[context.dataIndex];
+                                return `${percentage}%`;
+                            },
+                            color: 'black',
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        function updatePieChart(data) {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            const chart = Chart.getChart('pieChart');
+            if (chart) {
+                chart.destroy();
+            }
+
+            const totalUsage = data.reduce((acc, item) => acc + convertToMinutes(item.emUso), 0);
+            const totalIdle = data.reduce((acc, item) => acc + convertToMinutes(item.ocioso), 0);
+            const totalHours = totalUsage + totalIdle;
+
+            const usagePercentage = (totalUsage / totalHours) * 100;
+            const idlePercentage = (totalIdle / totalHours) * 100;
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Em estoque', 'Vendidos'],
+                    datasets: [{
+                        data: [totalUsage, totalIdle],
+                        backgroundColor: ['#82ca9d', '#8884d8'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    const totalMinutes = tooltipItem.raw;
+                                    const hours = Math.floor(totalMinutes / 60);
+                                    const minutes = totalMinutes % 60;
+                                    const percentage = (totalMinutes / totalHours * 100).toFixed(2);
+                                    return `${tooltipItem.label}: ${hours}h ${minutes}m (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            formatter: (value, context) => {
+                                const percentage = (value / totalHours * 100).toFixed(2);
+                                return `${percentage}%`;
+                            },
+                            color: '#fff',
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        function updateTop5Chart(chartId, data, key, label) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            const chart = Chart.getChart(chartId);
+            if (chart) {
+                chart.destroy();
+            }
+
+            const sortedData = data.sort((a, b) => convertToMinutes(b[key]) - convertToMinutes(a[key])).slice(0, 5);
+            const hoursData = sortedData.map(item => convertToMinutes(item[key]));
+            const totalHours = hoursData.reduce((acc, val) => acc + val, 0);
+            const percentages = hoursData.map(value => ((value / totalHours) * 100).toFixed(2));
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedData.map(item => item.pc),
+                    datasets: [{
+                        label: label,
+                        data: hoursData,
+                        backgroundColor: key === 'ocioso' ? '#8884d8' : '#82ca9d',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Quantidade'
+                            }
+                        },
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    const totalMinutes = tooltipItem.raw;
+                                    const hours = Math.floor(totalMinutes / 60);
+                                    const minutes = totalMinutes % 60;
+                                    const percentage = percentages[tooltipItem.dataIndex];
+                                    return `${label}: ${hours}h ${minutes}m (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            formatter: function (value, context) {
+                                const percentage = percentages[context.dataIndex];
+                                return `${percentage}%`;
+                            },
+                            color: '#fff',
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populatePCSelect();
+            populateDateSelect();
+            updateCharts(); // Inicializa os gráficos com todos os dados
+        });
+    </script>
+</body>
+
+</html>

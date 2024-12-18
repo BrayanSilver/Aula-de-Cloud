@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Estoques</title>
+    <link rel="stylesheet" href="/app/public/css/style3.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .aaa:hover {
+            background-color: black;
+        }
+
+        .carousel {
+            position: relative;
+            margin-top: 30px;
+            display: flex;
+            overflow: hidden;
+            width: 70%;
+            margin-left: 66px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-images {
+            display: flex;
+            transition: transform 0.5s;
+        }
+
+        .carousel-images img {
+            width: 77%;
+            height: 400px;
+            border-radius: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #0d556d;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: rgb(0, 0, 0);
+        }
+
+        #prev,
+        #next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        #prev {
+            left: 10px;
+        }
+
+        #next {
+            right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar close">
+        <div class="logo-details">
+            <span class="logo_name" style="margin-left: 20px;">
+                Estoque Master
+            </span>
+        </div>
+        <ul class="nav-links" style="margin-top: 33px;">
+            <li>
+                <a href="#">
+                    <i class='bx bx-grid-alt'></i>
+                    <span class="link_name">Painel</span>
+                </a>
+            </li>
+            <li>
+                <div class="iocn-link">
+                    <a href="#">
+                        <i class='bx bx-collection'></i>
+                        <span class="link_name">Gerenciar Estoque</span>
+                    </a>
+                    <i class='bx bxs-chevron-down arrow'></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a class="link_name" href="#">Gerenciar Estoque</a></li>
+                    <li data-permission="cadastro_produtos"><a href="/app/public/cadastro.html">Cadastro de
+                            Produtos</a></li>
+                    <li data-permission="movimentacoes"><a href="/app/public/dashboard.html">Dashboard</a></li>
+            </li>
+
+        </ul>
+        </li>
+        <li>
+            <div class="profile-details">
+                <div class="profile-content"></div>
+                <div class="name-job">
+                    <div class="profile_name" id="profile_name"></div>
+                    <span
+                        style="width:10px; height:10px; border-radius:50%; background-color:rgb(0, 255, 85); display:inline-block; margin-right:5px;"></span>
+                    <div class="job">Logado</div>
+                </div>
+                <a href="#" id="logoutBtn" class="aaa">
+                    <i class='bx bx-log-out'></i>
+                </a>
+            </div>
+        </li>
+        </ul>
+    </div>
+
+    <section class="home-section">
+        <div class="home-content">
+            <i class='bx bx-menu'></i>
+            <span class="text">Sistema de Estoque</span>
+        </div>
+        <div class="welcome-message" style="margin-left: 66px; margin-top: 70px;">
+            <h1 id="welcome_user" style="font-size: xx-large;"></h1> <br>
+            <h1>Bem-vindo ao Sistema de Estoque!</h1>
+            <p>Este sistema foi desenvolvido para ajudar na gestão eficiente do estoque, cadastro de produtos e
+                acompanhamento de movimentações. Utilize o menu lateral para acessar as funcionalidades disponíveis e
+                otimizar seus processos de inventário.</p>
+        </div>
+
+        <div class="carousel">
+            <div class="carousel-images">
+                <img src="/app/public/img/executivos.jpeg" alt="Controle de Estoque">
+                <img src="img/maosDadas.jpeg" alt="Cadastro de Produtos">
+                <img src="/app/public/img/prediosExecutivos.jpeg" alt="Relatórios e Inspeções">
+            </div>
+        </div>
+        <button id="prev">&#10094;</button>
+        <button id="next">&#10095;</button>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const username = localStorage.getItem('username');
+            const userPermissions = JSON.parse(localStorage.getItem('userPermissions')) || [];
+            
+            // Verifica se o usuário está autenticado
+            if (!username) {
+                // Redireciona para a página de login se não autenticado
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Atualiza a interface com o nome do usuário
+            document.getElementById('profile_name').textContent = username;
+            document.getElementById('welcome_user').textContent = `Bem-vindo, ${username}!`;
+
+            // Envia dados para o servidor
+            fetch('/api/userdata', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, userPermissions })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro ao enviar dados');
+                    return response.json();
+                })
+                .then(data => console.log('Dados enviados com sucesso:', data))
+                .catch(error => console.error('Erro:', error));
+
+            // Lógica do menu de subcategorias
+            const arrows = document.querySelectorAll(".arrow");
+            arrows.forEach(arrow => {
+                arrow.addEventListener("click", (e) => {
+                    const arrowParent = e.target.closest("li");
+                    arrowParent.classList.toggle("showMenu");
+                });
+            });
+
+            // Lógica da barra lateral
+            const sidebar = document.querySelector(".sidebar");
+            const sidebarBtn = document.querySelector(".bx-menu");
+            sidebarBtn.addEventListener("click", () => {
+                sidebar.classList.toggle("close");
+            });
+
+            // Lógica do carousel
+            let currentIndex = 0;
+            const images = document.querySelectorAll('.carousel-images img');
+            const totalImages = images.length;
+
+            document.getElementById('next').addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % totalImages;
+                updateCarousel();
+            });
+
+            document.getElementById('prev').addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + totalImages) % totalImages;
+                updateCarousel();
+            });
+
+            function updateCarousel() {
+                const carousel = document.querySelector('.carousel-images');
+                carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+            }
+
+            // Passar de imagem a cada 3 segundos
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalImages;
+                updateCarousel();
+            }, 3000);
+
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault(); // Evita o comportamento padrão do link
+                localStorage.removeItem('username');
+                localStorage.removeItem('userPermissions');
+                window.location.href = "login.html";
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+# comando para enviar app para ec2
+scp -i "C:\Users\manul\OneDrive\Área de Trabalho\sistemaestoque\key_vm_aluno_user1.pem" -r "app" ubuntu@ec2-52-90-19-189.compute-1.amazonaws.com:~
+
+# comando para entrar na máquina virtual
+ssh -i "key_vm_aluno_user1.pem" ubuntu@ec2-52-90-19-189.compute-1.amazonaws.com
+
+#comandos
+sudo apt update && sudo apt upgrade -y
+
+sudo apt install -y nodejs
+
+sudo apt install npm
+
+node -v
+
+npm -v
+
+cd app
+
+npm install
+
+cd src
+
+node server.js

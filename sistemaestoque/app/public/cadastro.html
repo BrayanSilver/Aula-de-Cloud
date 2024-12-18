@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Produto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #E4E9F7;
+            display: flex;
+        }
+
+        .sidebar {
+            background: #0d556d;
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.close {
+            width: 80px;
+        }
+
+        .logo-details {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo-details span {
+            font-size: 24px;
+            color: #fff;
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            flex-grow: 1;
+            padding-left: 20px;
+        }
+
+        .nav-links li {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: #070707;
+        }
+
+        .home-section {
+            margin-left: 260px;
+            padding: 20px;
+            width: calc(100% - 260px);
+            transition: margin-left 0.3s ease;
+        }
+
+        .home-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .home-content .text {
+            color: #11101d;
+            font-size: 26px;
+            font-weight: 600;
+            margin-left: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 90%;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+        }
+
+        h2,
+        h3 {
+            color: #393535;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            margin: 1rem 0;
+            font-size: 1.5rem;
+        }
+
+        label {
+            color: #393535;
+            margin-top: 1rem;
+            display: block;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-top: 0.5rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: #000000;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        table {
+            margin-top: 2rem;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        table th {
+            background: #000000;
+            color: #fff;
+        }
+
+        .delete-btn {
+            cursor: pointer;
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <span class="logo_name">Cadastro</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/app/public/index.html"><i class='bx bx-grid-alt'></i><span class="link_name">Home</span></a></li>
+            <li><a href="cadastro.html"><i class='bx bx-collection'></i><span class="link_name">Cadastro de
+                        Produtos</span></a></li>
+
+            <li>
+                <div class="profile-details">
+                    <a href="/app/public/index.html">
+                        <i class='bx bx-log-out'></i>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <section class="home-section">
+        <div class="home-content">
+            <i class='bx bx-menu'></i>
+            <span class="text">Cadastro de Produto</span>
+        </div>
+
+        <div class="container">
+            <h2>Cadastro de Produto</h2>
+            <form id="formCadastro">
+                <label for="cliente">Cliente:</label>
+                <input type="text" id="cliente" required placeholder="Digite o nome do cliente...">
+
+                <label for="obra">Obra:</label>
+                <input type="text" id="obra" required placeholder="Digite o nome da obra...">
+
+                <label for="valorEstimado">Valor Estimado da Obra:</label>
+                <input type="text" id="valorEstimado" required oninput="formatCurrency(this)"
+                    placeholder="Digite o valor estimado...">
+
+                <label for="solicitante">Solicitante:</label>
+                <input type="text" id="solicitante" required placeholder="Digite o nome do solicitante...">
+
+                <label for="segmentoRegional">Segmento/Regional:</label>
+                <select id="segmentoRegional" required>
+                    <option value="" disabled selected>Selecione...</option>
+                    <option value="Regional SE / CO / NO / NE">Regional SE / CO / NO / NE</option>
+                    <option value="Regional SP">Regional SP</option>
+                    <option value="Regional Sul">Regional Sul</option>
+                    <option value="Filial SP">Filial SP</option>
+                    <option value="Segmento Supermercados">Segmento Supermercados</option>
+                    <option value="Segmento Indústria">Segmento Indústria</option>
+                </select>
+
+                <label for="informacoesAdicionais">Informações Adicionais:</label>
+                <textarea id="informacoesAdicionais" placeholder="Digite informações adicionais..."></textarea>
+
+                <button type="button" onclick="enviarCadastro()">Cadastrar Produto</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // Função para enviar os dados para o servidor
+        function enviarCadastro() {
+            // Pegando os valores dos campos do formulário
+            const dados = {
+                solicitante: document.getElementById('solicitante').value,
+                cliente: document.getElementById('cliente').value,
+                obra: document.getElementById('obra').value,
+                segmento_regional: document.getElementById('segmentoRegional').value,  // Ajustado para o nome correto do campo
+                valor_estimado: document.getElementById('valorEstimado').value,  // Ajustado para o nome correto do campo
+                informacoes_adicionais: document.getElementById('informacoesAdicionais') ? document.getElementById('informacoesAdicionais').value : '',  // Verificação para campo opcional
+            };
+
+            // Verificando se todos os campos obrigatórios foram preenchidos
+            if (!dados.solicitante || !dados.cliente || !dados.obra || !dados.segmento_regional || !dados.valor_estimado) {
+                alert('Todos os campos obrigatórios devem ser preenchidos!');
+                return; // Interrompe o envio se algum campo obrigatório estiver vazio
+            }
+
+            // Enviando os dados via POST para a API
+            fetch('http://localhost:3000/inserir_visita', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Definindo o tipo de conteúdo para JSON
+                },
+                body: JSON.stringify(dados), // Enviando os dados em formato JSON
+            })
+                .then(response => response.json())  // Convertendo a resposta da API em formato JSON
+                .then(data => {
+                    if (data.message === 'Cadastro inserido com sucesso!') { // Verificando a resposta da API
+                        alert('Cadastro realizado com sucesso!');
+                        document.getElementById('formCadastro').reset();  // Limpar o formulário após sucesso
+                    } else {
+                        alert('Erro ao cadastrar os dados: ' + data.message);  // Exibe a mensagem de erro se houver
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar os dados ao servidor:', error);
+                    alert('Erro ao enviar os dados ao servidor.');  // Caso ocorra erro na requisição
+                });
+        }
+    </script>
+</body>
+
+</html>
